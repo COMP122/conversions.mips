@@ -6,7 +6,7 @@ This is a program assignment that will be updated throughout the next two weeks.
 
 1. Accept the assignment via the github classroom link provided during class
 2. Create an initial repository
-3. Copy the starter code (starter_code.mps) into conversions.mips
+3. Copy the starter code (starter_code.mips) into conversions.mips
 4. Commit/Push your initial version to your repo
 
 # Version 1:
