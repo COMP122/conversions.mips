@@ -59,3 +59,27 @@ This is a program assignment that will be updated throughout the next two weeks.
          - the value to be convert
       1. to print the buffer via the "print_string" system call
 2. Associated a tag called "version_3" with your completed implementation
+
+# Version 4:
+1. Rename your subroutine "percent_base_10" to percent_unsigned_base.
+2. Modify your subroutine to take an additional input argument, the base.
+3. Modify your subroutine to use the base to convert to the given base.
+   - note that you must also update the steps to convert your remainder to an ASCII digit
+   ```
+   if (digit <= 9) 
+       ascii_digit = digit + '0';
+   if (digit > 9)
+       ascii_digit = digit - 10 + 'A';  
+   ```
+4. Associated a tag called "version_4 with your complemented implementation.
+
+# Version 5:
+1. Create a new subroutine called: percent_signed_base
+2. This routine should 
+   - insert a '+' or a '-' into the buffer based upon the given value.
+   - calculate the two's complement of the value ``complement = (~ value) + 1``
+   - make a subroutine call to percent_unsigned_base to 
+3. Associate a tag called "version_5 with your complemented implementation.
+ 
+   - 
+4. This rou
