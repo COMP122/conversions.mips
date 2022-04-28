@@ -78,8 +78,6 @@ This is a program assignment that will be updated throughout the next two weeks.
 2. This routine should 
    - insert a '+' or a '-' into the buffer based upon the given value.
    - calculate the two's complement of the value ``complement = (~ value) + 1``
-   - make a subroutine call to percent_unsigned_base to 
+   - make a subroutine call to percent_unsigned_base to print out the value of complement.
 3. Associate a tag called "version_5 with your complemented implementation.
- 
-   - 
-4. This rou
+
