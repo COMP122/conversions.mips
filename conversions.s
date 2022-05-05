@@ -21,6 +21,16 @@
     	syscall
 .end_macro
 
+.macro 	push(%reg)
+	subi $sp, $sp, 4
+	sw %reg, 0($sp)
+.end_macro
+
+.macro 	pop(%reg)
+	lw %reg, 0($sp)
+	addi $sp, $sp, 4
+.end_macro
+
             
 main:
     	# $t1: count
@@ -50,20 +60,29 @@ percent_base_10:  nop   	# percent_base_10(value)
     	# $t1: value
     	# $t2: digit
     	# $t3: 10
+    	# $t4: size
 
 	# Copy the values from the "a" registers
 	move $t1, $a0	# print_int requires us to reuse the $a0 register
 	li $t3, 10 		# place the immediate value in register
 
 	li $t0, 0		## count = 0;
-   top:	nop		## do {
+   top1:	nop		## do {
     	divu $t1, $t3 	##
     	mfhi $t2		##   digit = value % base;
     	mflo $t1 		##   value = value / base;
-    	print_int($t2)          ##   print_int(digit)
+    	push($t2)          	##   push(digit)
 	addi $t0, $t0, 1	##   count++;
 
-	bne $t1, $zero, top     ## } while (value != 0);
+	bne $t1, $zero, top1    ## } while (value != 0);
 
-	move $v0, $t0	## return count
+    	move $t4, $t0	## size = count;
+    top2:	nop		## do {
+    	pop($t2)		##    pop(digit);
+    	print_int($t2)	##    print_int
+    	subi $t0, $t0, 1	##    count --;
+
+	bgt $t0, $zero, top2	## } while (count > 0 );
+  		# 
+	move $v0, $t4	## return size;
     	jr $ra
