@@ -34,9 +34,10 @@ main:
                 syscall
                 move $t8, $v0
         
-                move $a0, $t8           # count = percent_base_10(&buffer, size, 1234)
+                move $a0, $t8           # count = percent_base_10(&buffer, size, 1234, 10)
                 li $a1, 16
-                li $a2, 1234    
+                li $a2, 1234   
+                li $a3, 8 
                 jal percent_base_10
                 move $t7, $v0           
                 
@@ -49,17 +50,18 @@ main:
                 syscall
         
         
-percent_base_10:  nop                   # percent_base_10(&buffer, size, value)
-                                        # prints the value in ASCII on stdout
+percent_base_10:  nop                   # percent_base_10(&buffer, size, value, base)
                 # v0: count
                 # a0: &buffer
                 # a1: size
                 # a2: value
+                # a3: base
                 # t0: count
                 # t1: value
                 # t2: digit
-                # t3: 10
+                # t3: base (10)         # the base was hard-coded but now a parameter
                 # t4: size
+                # t5: 9                 # The constant
                 # s0: &buffer           # I did not want to re-adjust all my previous
                 # s1: size              # register allocation, so I just place the new
                 # s2: buff[count]       # variables in the "s" registers
@@ -67,8 +69,9 @@ percent_base_10:  nop                   # percent_base_10(&buffer, size, value)
                 # Copy the values from the "a" registers
                 move $s0, $a0
                 move $s1, $a1
-                move $t1, $a2   
-                li $t3, 10              # place the immediate value in register
+                move $t1, $a2 
+                move $t3, $a3  
+                li $t5, 9               # place the immediate value in register
         
                 li $t0, 0               ## count = 0;
 
@@ -88,9 +91,18 @@ percent_base_10:  nop                   # percent_base_10(&buffer, size, value)
                 pop($t2)                ##   pop(digit);
 
                                         ##   buffer[count] = digit2ascii(digit)
-                add $t2, $t2, '0'            # digit = digit + '0' // transform it to ascii
-                add $s2, $s0, $t0            # location = buffer + count
-                sb $t2, 0($s2)          ##   # mem[location] = digit
+                ble $t2, $t5, digit0_9  #    if (digit <= 9) 
+                b digitA_F
+    digit0_9:   addi $t2, $t2, '0'      #        ascii_digit = digit + '0';
+                b store
+
+                                        #    if (digit > 9)
+    digitA_F:   subi $t2, $t2, 10       #        ascii_digit = digit - 10 + 'A'; 
+                addi $t2, $t2, 'A'
+                b store
+
+    store:      add $s2, $s0, $t0            # location = buffer + count
+                sb $t2, 0($s2)          ##   # mem[location] = ascii_digit
   
                 addi $t0, $t0, 1        ##   count++;
                 subi $t4, $t4, 1        ##   size--;
