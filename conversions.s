@@ -36,9 +36,9 @@ main:
         
                 move $a0, $t8           # count = percent_base_10(&buffer, size, 1234, 10)
                 li $a1, 16
-                li $a2, 1234   
-                li $a3, 8 
-                jal percent_base_10
+                li $a2, -1234   
+                li $a3, 10 
+                jal percent_signed_base
                 move $t7, $v0           
                 
                 move $a0, $t8           # print_string(buffer)
@@ -48,9 +48,48 @@ main:
                 li $a0, 0               # exit(0)
                 li $v0, 17
                 syscall
+
+
+percent_signed_base:                    # percent_signed_base(&buffer, size, value, base)
+                # a0: buffer
+                # a1: size
+                # a2: value
+                # a3: base
+                # t1: char              # a real temp register
+
+                # Since this routine is just a facade for unsigned base
+                # Lets reuse the same "a" registers, i.e., don't bother to marshal
+                blt $a2, $zero, neg_num
+                bgt $a2, $zero, pos_num
+                nop                     # value is zero
+                b cont
+
+      neg_num:  nop                     # if (value < 0) {
+                li $t1, '-'             #    buffer[0] = '-';
+                sw $t1, 0($a0)          
+                addi $a0, $a0, 1        #    buffer++;
+                subi $a1, $a1, 1        #    size --;
+                nor $a2,$a2, $zero      #    value = (~value + 1);
+                addi $a2, $a2, 1
+                b cont
+
+      pos_num:  nop                     # } elsif (value > 0) {
+                li $t1, '+'             #    buffer[0] = '+';
+                sw $t1, 0($a0)
+                addi $a0, $a0, 1        #    buffer++;
+                subi $a1, $a1, 1        #    size --;
+                b cont
+                       
+      cont:     # opps!  makine a subroutine call
+                # the $ra value is going to be overwritten
+                push($ra)
+                jal percent_unsigned_base
+                pop($ra)
+                # no need to remarshal return values
+                jr $ra
+
         
-        
-percent_base_10:  nop                   # percent_base_10(&buffer, size, value, base)
+percent_unsigned_base:  nop             # percent_unsigned_base(&buffer, size, value, base)
                 # v0: count
                 # a0: &buffer
                 # a1: size
